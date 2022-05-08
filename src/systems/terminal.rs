@@ -18,5 +18,4 @@ pub(crate) fn update_position(
             );
         }
     }
-    terminal.draw_border_single();
 }

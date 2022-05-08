@@ -5,7 +5,7 @@ pub(crate) fn spawn_player(mut commands: Commands) {
     use crate::components::terminal::{Position, Symbol};
     commands
         .spawn()
-        .insert(Position { x: 0, y: 0 })
+        .insert(Position { x: 25, y: 25 })
         .insert(Being)
         .insert(Health(100))
         .insert(Name("Player".to_string()))
