@@ -225,6 +225,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_ascii_terminal"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a52bb6301702192ee812d454a9ca83323bbc7a7b499375e568da61bd1cffd51"
+dependencies = [
+ "bevy",
+ "bitflags",
+ "itertools",
+ "ron 0.6.6",
+ "sark_grids",
+]
+
+[[package]]
 name = "bevy_asset"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -601,7 +614,7 @@ dependencies = [
  "bevy_hierarchy",
  "bevy_reflect",
  "bevy_utils",
- "ron",
+ "ron 0.7.0",
  "serde",
  "thiserror",
  "uuid",
@@ -669,6 +682,15 @@ dependencies = [
  "glyph_brush_layout",
  "serde",
  "thiserror",
+]
+
+[[package]]
+name = "bevy_tiled_camera"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "be5de1d7c1325e10d8cc71767a05c688c18c5eec79f34d2c924faef2c889d9c6"
+dependencies = [
+ "bevy",
 ]
 
 [[package]]
@@ -861,6 +883,12 @@ dependencies = [
  "serde_derive",
  "toml",
 ]
+
+[[package]]
+name = "cast"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37b2a672a2cb129a2e41c10b1224bb368f9f37a2b16b612598138befd7b37eb5"
 
 [[package]]
 name = "cc"
@@ -1248,6 +1276,12 @@ name = "downcast-rs"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
+
+[[package]]
+name = "either"
+version = "1.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
 
 [[package]]
 name = "env_logger"
@@ -1672,6 +1706,15 @@ checksum = "f21dcc74995dd4cd090b147e79789f8d65959cbfb5f0b118002db869ea3bd0a0"
 dependencies = [
  "core-foundation-sys 0.6.2",
  "mach 0.2.3",
+]
+
+[[package]]
+name = "itertools"
+version = "0.10.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a9a9d19fa1e79b6215ff29b9d6880b706147f16e9b1dbb1e4e5947b5b02bc5e3"
+dependencies = [
+ "either",
 ]
 
 [[package]]
@@ -2487,6 +2530,19 @@ name = "roguelike"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "bevy_ascii_terminal",
+ "bevy_tiled_camera",
+]
+
+[[package]]
+name = "ron"
+version = "0.6.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "86018df177b1beef6c7c8ef949969c4f7cb9a9344181b92486b23c79995bdaa4"
+dependencies = [
+ "base64",
+ "bitflags",
+ "serde",
 ]
 
 [[package]]
@@ -2539,6 +2595,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "sark_grids"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1444adf4a992f5775456786af419d73a013b625a58f491b32dab57f0c1ad0a62"
+dependencies = [
+ "cast",
+ "glam",
+ "itertools",
 ]
 
 [[package]]

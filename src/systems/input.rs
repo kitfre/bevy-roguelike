@@ -1,7 +1,7 @@
 use crate::components::being::Player;
+use crate::components::terminal::Position;
 use crate::components::input::Action;
 
-use crate::Position;
 use bevy::prelude::{Query, Res, With};
 
 pub(crate) fn handle_input(

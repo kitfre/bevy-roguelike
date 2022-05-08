@@ -7,3 +7,5 @@ edition = "2021"
 
 [dependencies]
 bevy = "0.7.0"
+bevy_ascii_terminal = "0.9.1"
+bevy_tiled_camera = "0.3.1"
