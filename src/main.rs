@@ -7,8 +7,8 @@ use bevy::prelude::*;
 
 fn main() {
     App::new()
-        .add_plugin(ActionPlugin)
         .add_plugins(DefaultPlugins)
+        .add_plugin(ActionPlugin)
         .add_startup_system(setup_camera)
         .add_startup_system(crate::systems::being::spawn_player)
         .add_system(size_scaling)

@@ -1,4 +1,5 @@
-use crate::components::input::{action_input_system, Action, ActionSystem, KeyBindings, handle_input};
+use crate::components::input::{action_input_system, Action, ActionSystem, KeyBindings};
+use crate::systems::input::handle_input;
 use bevy::input::keyboard::KeyboardInput;
 use bevy::prelude::{App, CoreStage, Input, KeyCode, ParallelSystemDescriptorCoercion, Plugin};
 
@@ -14,7 +15,7 @@ impl Plugin for ActionPlugin {
             .add_system_to_stage(
                 CoreStage::PreUpdate,
                 action_input_system.label(ActionSystem),
-            );
+            )
             .add_system(handle_input);
     }
 }
