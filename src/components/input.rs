@@ -1,5 +1,4 @@
-use bevy::input::keyboard::KeyboardInput;
-use bevy::prelude::{EventReader, KeyCode, Res, ResMut, SystemLabel};
+use bevy::prelude::{KeyCode, SystemLabel};
 
 pub(crate) struct KeyBindings {
     bindings: std::collections::HashMap<KeyCode, Action>,
@@ -41,25 +40,3 @@ pub(crate) enum Direction {
 
 #[derive(PartialEq, Eq, Clone, Copy, Hash, Debug, SystemLabel)]
 pub(crate) struct ActionSystem;
-
-pub(crate) fn action_input_system(
-    bindings: Res<KeyBindings>,
-    mut action: ResMut<Option<Action>>,
-    mut key_reader: EventReader<KeyboardInput>,
-) {
-    for event in key_reader.iter() {
-        if let KeyboardInput {
-            key_code: Some(key_code),
-            state,
-            ..
-        } = event
-        {
-            match bindings.resolve_keycode(*key_code) {
-                Some(act) if state.is_pressed() => {
-                    *action = Some(act);
-                }
-                _ => *action = None,
-            }
-        }
-    }
-}
