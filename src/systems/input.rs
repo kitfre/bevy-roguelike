@@ -1,6 +1,6 @@
 use crate::components::being::Player;
 use crate::components::input::{Action, KeyBindings};
-use crate::components::map::Walls;
+use crate::components::map::Map;
 use crate::components::terminal::Position;
 
 use bevy::input::keyboard::KeyboardInput;
@@ -10,7 +10,7 @@ use bevy_ascii_terminal::Terminal;
 
 pub(crate) fn handle_input(
     action: Res<Input<Action>>,
-    walls: Res<Walls>,
+    map_q: Query<&Map>,
     mut players: Query<Entity, With<Player>>,
     mut positions: Query<&mut Position>,
     term_q: Query<&Terminal>,
@@ -19,11 +19,7 @@ pub(crate) fn handle_input(
 
     let terminal = term_q.get_single().unwrap();
 
-    let wall_positions = walls
-        .0
-        .iter()
-        .map(|&p| positions.get(p).unwrap().clone())
-        .collect::<Vec<Position>>();
+    let map = map_q.get_single().unwrap();
 
     if let Some(player) = players.iter_mut().next() {
         let mut pos = positions.get_mut(player).unwrap();
@@ -54,7 +50,7 @@ pub(crate) fn handle_input(
         if terminal.is_in_bounds([new_pos.x, new_pos.y]) {
             // check if the new position collides with a wall
 
-            if wall_positions.into_iter().find(|&p| p == new_pos).is_none() {
+            if !map.wall_at(new_pos) {
                 *pos = new_pos;
             }
         }
