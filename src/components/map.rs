@@ -142,8 +142,8 @@ impl Map {
             .flatten()
     }
 
-    fn in_bounds(&self, pos: Position) -> bool {
-        (pos.x as usize) < self.grid.0.len() && (pos.y as usize) <= self.grid.0[0].len()
+    pub(crate) fn in_bounds(&self, pos: Position) -> bool {
+        (pos.x as usize) < self.grid.0.len() && (pos.y as usize) < self.grid.0[0].len()
     }
 }
 

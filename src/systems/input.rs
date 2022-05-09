@@ -42,7 +42,7 @@ pub(crate) fn handle_input(
         };
 
         // check if the new position collides with a wall
-        if map.open(new_pos) {
+        if map.in_bounds(new_pos) && map.open(new_pos) {
             *pos = new_pos;
         }
     }
