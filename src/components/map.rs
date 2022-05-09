@@ -136,7 +136,27 @@ pub(crate) struct Rect {
 }
 
 impl Rect {
-    fn intersects(&self, other: &Rect) -> bool {
+    pub(crate) fn random(min_x: u32, max_x: u32, min_y: u32, max_y: u32) -> Self {
+        use rand::Rng;
+
+        let mut rng = rand::thread_rng();
+
+        let start = Position {
+            x: rng.gen_range(min_x..max_x) as i32,
+            y: rng.gen_range(min_y..max_y) as i32,
+        };
+
+        let width = rng.gen_range(min_x..max_x - start.x as u32);
+        let height = rng.gen_range(min_y..max_y - start.y as u32);
+
+        Self {
+            start,
+            width,
+            height,
+        }
+    }
+
+    pub(crate) fn intersects(&self, other: &Rect) -> bool {
         let (x_start, x_end) = (self.start.x as u32, self.start.x as u32 + self.width);
         let (y_start, y_end) = (self.start.y as u32, self.start.y as u32 + self.height);
 
