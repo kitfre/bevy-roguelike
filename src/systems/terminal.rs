@@ -1,11 +1,11 @@
 use crate::components::map::Map;
 use crate::components::terminal::{Position, Symbol};
-use bevy::prelude::{Color, Query};
+use bevy::prelude::{Color, Query, Res};
 use bevy_ascii_terminal::CharFormat;
 use bevy_ascii_terminal::Terminal;
 
 pub(crate) fn update_position(
-    map_q: Query<&Map>,
+    map: Res<Map>,
     q: Query<(&Position, &Symbol)>,
     mut term_q: Query<&mut Terminal>,
 ) {
@@ -13,7 +13,6 @@ pub(crate) fn update_position(
     terminal.clear();
 
     // draw the map first
-    let map = map_q.get_single().unwrap();
     map.render(terminal.as_mut());
 
     // draw entities over it

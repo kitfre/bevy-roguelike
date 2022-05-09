@@ -27,17 +27,15 @@ pub(crate) struct Grid(Vec<Vec<Tile>>);
 
 impl Map {
     pub(crate) fn square(size: usize) -> Self {
-        let mut grid = Grid::square(size);
-
-        // set the borders to be walls
-        for i in 0..size {
-            grid.0[0][i] = Tile::Wall;
-            grid.0[i][0] = Tile::Wall;
-            grid.0[size - 1][i] = Tile::Wall;
-            grid.0[i][size - 1] = Tile::Wall;
-        }
+        let grid = Grid::square(size);
 
         Self { grid }
+    }
+
+    pub(crate) fn add_rects(&mut self, rects: impl Iterator<Item = Rect>) {
+        for rect in rects {
+            self.grid.add_rect(&rect);
+        }
     }
 
     pub(crate) fn open(&self, pos: Position) -> bool {
@@ -58,6 +56,30 @@ impl Map {
             Tile::Wall => true,
             _ => false,
         }
+    }
+
+    pub(crate) fn pick_open_space(&self) -> Option<Position> {
+        use rand::seq::IteratorRandom;
+
+        let mut rng = rand::thread_rng();
+        self.grid
+            .0
+            .iter()
+            .enumerate()
+            .map(|(x, tiles)| {
+                tiles
+                    .iter()
+                    .enumerate()
+                    .filter_map(move |(y, tile)| match tile {
+                        Tile::Wall => None,
+                        Tile::Floor => Some(Position {
+                            x: x as i32,
+                            y: y as i32,
+                        }),
+                    })
+            })
+            .flatten()
+            .choose(&mut rng)
     }
 
     pub(crate) fn render(&self, terminal: &mut Terminal) {
@@ -85,9 +107,47 @@ impl Map {
 impl Grid {
     fn square(size: usize) -> Self {
         let tiles: Vec<Vec<Tile>> = (0..size)
-            .map(|_| (0..size).map(|_| Tile::Floor).collect())
+            .map(|_| (0..size).map(|_| Tile::Wall).collect())
             .collect();
 
         Self(tiles)
+    }
+
+    fn add_rect(&mut self, rect: &Rect) {
+        let x_start = rect.start.x as usize;
+        let y_start = rect.start.y as usize;
+
+        let x_end = x_start + rect.width as usize;
+        let y_end = y_start + rect.height as usize;
+
+        for x in x_start..x_end {
+            for y in y_start..y_end {
+                self.0[x][y] = Tile::Floor;
+            }
+        }
+    }
+}
+
+pub(crate) struct Rect {
+    // bottom-left corner
+    pub start: Position,
+    pub width: u32,
+    pub height: u32,
+}
+
+impl Rect {
+    fn intersects(&self, other: &Rect) -> bool {
+        let (x_start, x_end) = (self.start.x as u32, self.start.x as u32 + self.width);
+        let (y_start, y_end) = (self.start.y as u32, self.start.y as u32 + self.height);
+
+        let (other_x_start, other_x_end) =
+            (other.start.x as u32, other.start.x as u32 + other.width);
+        let (other_y_start, other_y_end) =
+            (other.start.y as u32, other.start.y as u32 + other.height);
+
+        !(x_end < other_x_start
+            || other_x_end < x_start
+            || y_end < other_y_start
+            || other_y_end < y_start)
     }
 }

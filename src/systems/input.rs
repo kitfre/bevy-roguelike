@@ -9,15 +9,13 @@ use bevy::prelude::{EventReader, Input, Query, Res, ResMut, With};
 
 pub(crate) fn handle_input(
     action: Res<Input<Action>>,
-    maps: Query<&Map>,
+    map: Res<Map>,
     mut positions: Query<&mut Position, With<Player>>,
 ) {
     use crate::components::input::{Action::Move, Direction::*};
     if !action.is_changed() {
         return;
     }
-
-    let map = maps.get_single().unwrap();
 
     if let Some(mut pos) = positions.iter_mut().next() {
         let new_pos = if action.pressed(Move(Left)) {
