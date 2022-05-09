@@ -1,13 +1,18 @@
-use crate::components::terminal::Position;
 use bevy::prelude::{Color, Component};
 use bevy_ascii_terminal::{CharFormat, Terminal};
+
+#[derive(Debug, Component, PartialEq, Eq, Clone, Copy, Hash, PartialOrd, Ord)]
+pub(crate) struct Position {
+    pub x: u32,
+    pub y: u32,
+}
 
 #[derive(Component)]
 pub(crate) struct Map {
     grid: Grid,
 }
 
-#[derive(Component)]
+#[derive(Component, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Tile {
     Wall,
     Floor,
@@ -26,10 +31,48 @@ impl Tile {
 pub(crate) struct Grid(Vec<Vec<Tile>>);
 
 impl Map {
-    pub(crate) fn square(size: usize) -> Self {
-        let grid = Grid::square(size);
+    pub(crate) fn set(&mut self, pos: Position, tile: Tile) {
+        if self.in_bounds(pos) {
+            self.grid.0[pos.x as usize][pos.y as usize] = tile;
+        }
+    }
 
-        Self { grid }
+    pub(crate) fn tile_at(&self, pos: Position) -> Option<Tile> {
+        self.grid
+            .0
+            .get(pos.x as usize)
+            .and_then(|tiles| tiles.get(pos.y as usize))
+            .copied()
+    }
+
+    pub(crate) fn neighbors(&self, pos: Position) -> impl IntoIterator<Item = Position> {
+        let mut vec = Vec::new();
+
+        let Position { x, y } = pos;
+
+        if self.in_bounds(Position { x: x + 1, y }) {
+            vec.push(Position { x: x + 1, y });
+        }
+
+        if x > 0 && self.in_bounds(Position { x: x - 1, y }) {
+            vec.push(Position { x: x - 1, y });
+        }
+
+        if self.in_bounds(Position { x, y: y + 1 }) {
+            vec.push(Position { x, y: y + 1 })
+        }
+
+        if y > 0 && self.in_bounds(Position { x, y: y - 1 }) {
+            vec.push(Position { x, y: y - 1 });
+        }
+
+        vec
+    }
+
+    pub(crate) fn rect(width: u32, height: u32) -> Self {
+        Self {
+            grid: Grid::rect(width, height),
+        }
     }
 
     pub(crate) fn add_rects(&mut self, rects: impl Iterator<Item = Rect>) {
@@ -41,11 +84,7 @@ impl Map {
     pub(crate) fn open(&self, pos: Position) -> bool {
         let x = pos.x as usize;
         let y = pos.y as usize;
-        x < self.grid.0.len()
-            && pos.x >= 0
-            && y <= self.grid.0[0].len()
-            && pos.y >= 0
-            && !self.wall_at(pos)
+        x < self.grid.0.len() && y <= self.grid.0[0].len() && !self.wall_at(pos)
     }
 
     pub(crate) fn wall_at(&self, pos: Position) -> bool {
@@ -73,8 +112,8 @@ impl Map {
                     .filter_map(move |(y, tile)| match tile {
                         Tile::Wall => None,
                         Tile::Floor => Some(Position {
-                            x: x as i32,
-                            y: y as i32,
+                            x: x as u32,
+                            y: y as u32,
                         }),
                     })
             })
@@ -94,20 +133,6 @@ impl Map {
         })
     }
 
-    pub(crate) fn connect(&mut self, start: Position, end: Position) {
-        let start_x = std::cmp::min(start.x, end.x);
-        let start_y = std::cmp::min(start.y, end.y);
-        let end_x = std::cmp::max(start.x, end.x);
-        let end_y = std::cmp::max(start.y, end.y);
-
-        for x in start_x..=end_x {
-            self.grid.0[x as usize][start_y as usize] = Tile::Floor;
-        }
-        for y in start_y..=end_y {
-            self.grid.0[start_x as usize][y as usize] = Tile::Floor;
-        }
-    }
-
     fn tiles(&self) -> impl Iterator<Item = (usize, usize, &Tile)> {
         self.grid
             .0
@@ -116,12 +141,16 @@ impl Map {
             .map(|(x, row)| row.iter().enumerate().map(move |(y, tile)| (x, y, tile)))
             .flatten()
     }
+
+    pub(crate) fn in_bounds(&self, pos: Position) -> bool {
+        (pos.x as usize) < self.grid.0.len() && (pos.y as usize) < self.grid.0[0].len()
+    }
 }
 
 impl Grid {
-    fn square(size: usize) -> Self {
-        let tiles: Vec<Vec<Tile>> = (0..size)
-            .map(|_| (0..size).map(|_| Tile::Wall).collect())
+    fn rect(width: u32, height: u32) -> Self {
+        let tiles: Vec<Vec<Tile>> = (0..width)
+            .map(|_| (0..height).map(|_| Tile::Wall).collect())
             .collect();
 
         Self(tiles)
@@ -142,7 +171,7 @@ impl Grid {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct Rect {
     // bottom-left corner
     pub start: Position,
@@ -151,38 +180,46 @@ pub(crate) struct Rect {
 }
 
 impl Rect {
-    pub(crate) fn random(min_x: u32, max_x: u32, min_y: u32, max_y: u32) -> Self {
+    pub(crate) fn random(x: u32, y: u32, room_width: u32, room_height: u32) -> Self {
+        use rand::Rng;
+        let mut rng = rand::thread_rng();
+
+        let start = Position {
+            x: rng.gen_range(0..x),
+            y: rng.gen_range(0..y),
+        };
+
+        let mut width = rng.gen_range(1..room_width);
+        let mut height = rng.gen_range(1..room_height);
+
+        if start.x + width >= x {
+            width = x - start.x;
+        }
+
+        if start.y + height >= y {
+            height = y - start.y;
+        }
+
+        let rect = Self {
+            start,
+            width,
+            height,
+        };
+
+        rect
+    }
+
+    pub(crate) fn random_interior_position(&self) -> Position {
         use rand::Rng;
 
         let mut rng = rand::thread_rng();
 
-        let start = Position {
-            x: rng.gen_range(min_x..max_x) as i32,
-            y: rng.gen_range(min_y..max_y) as i32,
-        };
-
-        let width = rng.gen_range(min_x..max_x - start.x as u32);
-        let height = rng.gen_range(min_y..max_y - start.y as u32);
-
-        Self {
-            start,
-            width,
-            height,
-        }
-    }
-
-    pub(crate) fn intersects(&self, other: &Rect) -> bool {
         let (x_start, x_end) = (self.start.x as u32, self.start.x as u32 + self.width);
         let (y_start, y_end) = (self.start.y as u32, self.start.y as u32 + self.height);
 
-        let (other_x_start, other_x_end) =
-            (other.start.x as u32, other.start.x as u32 + other.width);
-        let (other_y_start, other_y_end) =
-            (other.start.y as u32, other.start.y as u32 + other.height);
-
-        !(x_end < other_x_start
-            || other_x_end < x_start
-            || y_end < other_y_start
-            || other_y_end < y_start)
+        Position {
+            x: rng.gen_range(x_start..x_end),
+            y: rng.gen_range(y_start..y_end),
+        }
     }
 }
