@@ -1,6 +1,7 @@
 mod components;
 mod plugins;
 mod systems;
+mod procgen;
 
 use crate::plugins::{ActionPlugin, MapPlugin, TerminalRenderPlugin};
 use bevy::prelude::*;
