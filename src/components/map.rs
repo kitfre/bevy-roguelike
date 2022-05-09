@@ -11,6 +11,7 @@ pub(crate) struct Map {
 pub(crate) enum Tile {
     Wall,
     Floor,
+    Empty,
 }
 
 impl Tile {
@@ -18,6 +19,7 @@ impl Tile {
         match self {
             Self::Wall => '#',
             Self::Floor => '.',
+            Self::Empty => ' ',
         }
     }
 }
@@ -72,7 +74,7 @@ impl Map {
                     .enumerate()
                     .filter_map(move |(y, tile)| match tile {
                         Tile::Wall => None,
-                        Tile::Floor => Some(Position {
+                        Tile::Floor | Tile::Empty => Some(Position {
                             x: x as i32,
                             y: y as i32,
                         }),
@@ -92,6 +94,20 @@ impl Map {
                 );
             }
         })
+    }
+
+    pub(crate) fn connect(&mut self, start: Position, end: Position) {
+        let start_x = std::cmp::min(start.x, end.x);
+        let start_y = std::cmp::min(start.y, end.y);
+        let end_x = std::cmp::max(start.x, end.x);
+        let end_y = std::cmp::max(start.y, end.y);
+
+        for x in start_x..=end_x {
+            self.grid.0[x as usize][start_y as usize] = Tile::Floor;
+        }
+        for y in start_y..=end_y {
+            self.grid.0[start_x as usize][y as usize] = Tile::Floor;
+        }
     }
 
     fn tiles(&self) -> impl Iterator<Item = (usize, usize, &Tile)> {
@@ -128,6 +144,7 @@ impl Grid {
     }
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub(crate) struct Rect {
     // bottom-left corner
     pub start: Position,

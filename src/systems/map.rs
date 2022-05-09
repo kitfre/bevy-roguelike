@@ -14,6 +14,11 @@ pub(crate) fn init_map() -> Map {
         }
     }
 
+    let start = rects[0];
+    for i in 1..4 {
+        map.connect(start.start, rects[i].start);
+    }
+
     map.add_rects(rects.into_iter());
     map
 }
