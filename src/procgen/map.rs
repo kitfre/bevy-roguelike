@@ -91,7 +91,7 @@ fn shortest_path(
         if let Some(curr) = open.pop() {
             if curr.pos == goal {
                 // TODO: reconstruct path
-                return None;
+                return reconstruct_path(came_from, curr.pos);
             }
 
             for neighbor in map.neighbors(curr.pos) {
@@ -109,6 +109,28 @@ fn shortest_path(
         }
     }
     None
+}
+
+fn reconstruct_path(
+    paths: std::collections::HashMap<Position, Position>,
+    start: Position,
+) -> Option<Vec<Position>> {
+    let mut path = vec![start];
+
+    let mut curr = start;
+    while paths.contains_key(&curr) {
+        match paths.get(&curr) {
+            None => {
+                return None;
+            }
+            Some(p) => {
+                curr = *p;
+                path.push(*p);
+            }
+        }
+    }
+
+    Some(path)
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]

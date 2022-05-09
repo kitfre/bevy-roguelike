@@ -189,15 +189,22 @@ impl Rect {
             y: rng.gen_range(0..y),
         };
 
-        let width = rng.gen_range(1..room_width);
-        let height = rng.gen_range(1..room_height);
+        let mut width = rng.gen_range(1..room_width);
+        let mut height = rng.gen_range(1..room_height);
+
+        if start.x + width >= x {
+            width = x - start.x;
+        }
+
+        if start.y + height >= y {
+            height = y - start.y;
+        }
+
         let rect = Self {
             start,
             width,
             height,
         };
-
-        println!("rect: {rect:?}");
 
         rect
     }
@@ -209,8 +216,6 @@ impl Rect {
 
         let (x_start, x_end) = (self.start.x as u32, self.start.x as u32 + self.width);
         let (y_start, y_end) = (self.start.y as u32, self.start.y as u32 + self.height);
-
-        println!("xs: {x_start}, xe: {x_end}, ys: {y_start}, ye: {y_end}");
 
         Position {
             x: rng.gen_range(x_start..x_end),
