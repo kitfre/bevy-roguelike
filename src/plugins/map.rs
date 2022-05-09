@@ -7,7 +7,15 @@ pub(crate) struct MapPlugin;
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(RoomsAndHallways::generate())
+        let mut gen = RoomsAndHallways {
+            width: 50,
+            height: 50,
+            room_width: 20,
+            room_height: 20,
+            max_rooms: 10,
+        };
+
+        app.insert_resource(gen.generate())
             .add_startup_system(spawn_player);
     }
 }

@@ -1,7 +1,6 @@
 use crate::components::being::Player;
 use crate::components::input::{Action, KeyBindings};
-use crate::components::map::Map;
-use crate::components::terminal::Position;
+use crate::components::map::{Map, Position};
 
 use bevy::input::keyboard::KeyboardInput;
 use bevy::input::ElementState;

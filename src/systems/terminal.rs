@@ -1,5 +1,5 @@
-use crate::components::map::Map;
-use crate::components::terminal::{Position, Symbol};
+use crate::components::map::{Map, Position};
+use crate::components::terminal::Symbol;
 use bevy::prelude::{Color, Query, Res};
 use bevy_ascii_terminal::CharFormat;
 use bevy_ascii_terminal::Terminal;
@@ -17,9 +17,9 @@ pub(crate) fn update_position(
 
     // draw entities over it
     for (pos, symbol) in q.iter() {
-        if terminal.is_in_bounds([pos.x, pos.y]) {
+        if terminal.is_in_bounds([pos.x as i32, pos.y as i32]) {
             terminal.put_char_formatted(
-                [pos.x, pos.y],
+                [pos.x as i32, pos.y as i32],
                 symbol.0,
                 CharFormat::new(Color::WHITE, Color::BLACK),
             );
