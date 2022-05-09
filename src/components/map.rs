@@ -11,7 +11,6 @@ pub(crate) struct Map {
 pub(crate) enum Tile {
     Wall,
     Floor,
-    Empty,
 }
 
 impl Tile {
@@ -19,7 +18,6 @@ impl Tile {
         match self {
             Self::Wall => '#',
             Self::Floor => '.',
-            Self::Empty => ' ',
         }
     }
 }
@@ -74,7 +72,7 @@ impl Map {
                     .enumerate()
                     .filter_map(move |(y, tile)| match tile {
                         Tile::Wall => None,
-                        Tile::Floor | Tile::Empty => Some(Position {
+                        Tile::Floor => Some(Position {
                             x: x as i32,
                             y: y as i32,
                         }),
