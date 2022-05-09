@@ -40,6 +40,16 @@ impl Map {
         Self { grid }
     }
 
+    pub(crate) fn open(&self, pos: Position) -> bool {
+        let x = pos.x as usize;
+        let y = pos.y as usize;
+        x < self.grid.0.len()
+            && pos.x >= 0
+            && y <= self.grid.0[0].len()
+            && pos.y >= 0
+            && !self.wall_at(pos)
+    }
+
     pub(crate) fn wall_at(&self, pos: Position) -> bool {
         let x = pos.x as usize;
         let y = pos.y as usize;

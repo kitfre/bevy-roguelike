@@ -5,24 +5,21 @@ use crate::components::terminal::Position;
 
 use bevy::input::keyboard::KeyboardInput;
 use bevy::input::ElementState;
-use bevy::prelude::{Entity, EventReader, Input, Query, Res, ResMut, With};
-use bevy_ascii_terminal::Terminal;
+use bevy::prelude::{EventReader, Input, Query, Res, ResMut, With};
 
 pub(crate) fn handle_input(
     action: Res<Input<Action>>,
-    map_q: Query<&Map>,
-    mut players: Query<Entity, With<Player>>,
-    mut positions: Query<&mut Position>,
-    term_q: Query<&Terminal>,
+    maps: Query<&Map>,
+    mut positions: Query<&mut Position, With<Player>>,
 ) {
     use crate::components::input::{Action::Move, Direction::*};
+    if !action.is_changed() {
+        return;
+    }
 
-    let terminal = term_q.get_single().unwrap();
+    let map = maps.get_single().unwrap();
 
-    let map = map_q.get_single().unwrap();
-
-    if let Some(player) = players.iter_mut().next() {
-        let mut pos = positions.get_mut(player).unwrap();
+    if let Some(mut pos) = positions.iter_mut().next() {
         let new_pos = if action.pressed(Move(Left)) {
             Position {
                 x: pos.x - 1,
@@ -47,12 +44,9 @@ pub(crate) fn handle_input(
             pos.clone()
         };
 
-        if terminal.is_in_bounds([new_pos.x, new_pos.y]) {
-            // check if the new position collides with a wall
-
-            if !map.wall_at(new_pos) {
-                *pos = new_pos;
-            }
+        // check if the new position collides with a wall
+        if map.open(new_pos) {
+            *pos = new_pos;
         }
     }
 }
